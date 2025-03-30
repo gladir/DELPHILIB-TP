@@ -11,6 +11,9 @@ Unit MATH;
 
 INTERFACE
 
+Type
+ TValueRelationship=(LessThan,Equals,GreaterThan);
+
 Function ArcCos(a:Extended):Extended;
 Function ArcCosH(x:Extended):Extended;
 Function ArcSin(a:Extended):Extended;
@@ -18,7 +21,10 @@ Function ArcSinH(x:Extended):Extended;
 Function ArcTan2(y,x:Extended):Extended;
 Function ArcTanH(x:Extended):Extended;
 Function Ceil(d:Extended):Extended;
+Function CompareValue(Const A,B:Extended;Epsilon:Extended):TValueRelationship;
 Function Cosh(x:Extended):Extended;
+Function Cotan(X:Extended):Extended;
+Function Tan(X:Extended):Extended;
 
 IMPLEMENTATION
 
@@ -83,12 +89,31 @@ Begin
  Ceil:=R;
 End;
 
+Function CompareValue(Const A,B:Extended;Epsilon:Extended):TValueRelationship;Begin
+ If Abs(A-B) < Epsilon Then CompareValue:=Equals Else
+ If A<B Then CompareValue:=LessThan
+        Else CompareValue:=GreaterThan;
+End;
+
 Function Cosh(x:Extended):Extended;Begin
  x:=FAbs(x);
  If x > 88.029691931 Then
   Cosh:=0 { Infini }
  Else
   Cosh:=(Exp(x)+Exp(-x))/ 2.0;
+End;
+
+Function Cotan(X:Extended):Extended;Begin
+ If Tan(X)=0 Then Begin
+  WriteLn('Erreur : Cotangente ind‚finie pour X = ', X);
+  Cotan:=0;
+ End
+  Else
+ Cotan:=1/Tan(X);
+End;
+
+Function Tan(X:Extended):Extended;Begin
+ Tan:=Sin(X)/Cos(X);
 End;
 
 END.
