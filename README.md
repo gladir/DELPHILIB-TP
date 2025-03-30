@@ -13,6 +13,10 @@ Bibliothèque de compatibilité avec Delphi écrit en Turbo Pascal
     <td>Cette unité contient les bases de la programmation pour effectuer des contrôles divers sur des fichiers.</td>
   </tr>
   <tr>
+    <td><b>MATH.PAS</b></td>
+    <td>Cette unité contient les fonctions et procédures de calcul mathématique.</td>
+  </tr>
+  <tr>
     <td><b>STRUTILS.PAS</b></td>
     <td>Cette unité contient les fonctions, procédures, variables et constantes avancé pour la manipulation des chaines de caractères.</td>
   </tr>
