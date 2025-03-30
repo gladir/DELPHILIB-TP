@@ -20,4 +20,8 @@ Bibliothèque de compatibilité avec Delphi écrit en Turbo Pascal
      <td><b>SYSUTILS.PAS</b></td>
      <td>Cette unité contient les fonctions, procédures, variables et constantes d'outils complémentaire au système.</td>
   </tr>
+  <tr>
+    <td><b>TYPES.PAS</b></td>
+    <td>Cette unité contient les types divers.</td>
+    </td>
 </table>
