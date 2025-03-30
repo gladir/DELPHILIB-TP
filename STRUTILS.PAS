@@ -14,7 +14,11 @@ Function AnsiContainsText(Const Text:String;Const SubText:String):Boolean;
 Function AnsiEndsStr(Const SubText:String;Const Text:String):Boolean;
 Function AnsiIndexStr(Const Text:String;Var Values:Array of String):Integer;
 Function AnsiLeftStr(Const Text:String; Const Count:Integer):String;
+Function AnsiMatchStr(Const Text:String;Var Values:Array of String):Boolean;
+Function AnsiMidStr(Const Text:String;Const Start:Integer;Const Count:Integer):String;
+Function AnsiReplaceStr(Const Text,FromText,ToText:String):String;
 Function AnsiReverseString(Const Text:String):String;
+Function AnsiRightStr(Const Text:String;Const Count:Integer):String;
 Function DupeString(Const Text:String;Count:Integer):String;
 
 IMPLEMENTATION
@@ -88,9 +92,51 @@ Begin
  AnsiIndexStr:=-1;
 End;
 
-
 Function AnsiLeftStr(Const Text:String; Const Count:Integer):String;Begin
  AnsiLeftStr:=Copy(Text,1,Count);
+End;
+
+Function AnsiMatchStr(Const Text:String;Var Values:Array of String):Boolean;
+Var
+ i,Len:Integer;
+ UpperText,UpperValue:String;
+Begin
+ UpperText:='';
+ For i:=1 to Length(Text)do UpperText:=UpperText+UpCase(Text[i]);
+ For i:=0 to High(Values) do Begin
+  UpperValue:='';
+  For Len:=1 to Length(Values[i]) do UpperValue:=UpperValue+UpCase(Values[i][Len]);
+  If UpperText = UpperValue Then Begin
+   AnsiMatchStr:=True;
+   Exit;
+  End;
+ End;
+ AnsiMatchStr:=False;
+End;
+
+Function AnsiMidStr(Const Text:String;Const Start:Integer;Const Count:Integer):String;Begin
+ If(Start<1)or(Start>Length(Text))Then AnsiMidStr:=''
+                                  Else AnsiMidStr:=Copy(Text,Start,Count);
+End;
+
+Function AnsiReplaceStr(Const Text,FromText,ToText:String):String;
+Var
+ PosStart,FromLen:Integer;
+ ResultStr:String;
+Begin
+ ResultStr:=Text;
+ FromLen:=Length(FromText);
+ If FromLen=0 Then Begin
+  AnsiReplaceStr:=Text;
+  Exit;
+ End;
+ PosStart:=Pos(FromText,ResultStr);
+ While PosStart>0 do Begin
+  Delete(ResultStr,PosStart,FromLen);
+  Insert(ToText,ResultStr,PosStart);
+  PosStart:=Pos(FromText,ResultStr);
+ End;
+ AnsiReplaceStr:=ResultStr;
 End;
 
 Function AnsiReverseString(Const Text:String):String;
@@ -102,6 +148,19 @@ Begin
  ResultStr:=Text;
  For i:=1 to Len do ResultStr[i]:=Text[Len-i+1];
  AnsiReverseString:=ResultStr;
+End;
+
+Function AnsiRightStr(Const Text:String;Const Count:Integer):String;
+Var
+ StartPos:Integer;
+Begin
+ If Count<=0 Then AnsiRightStr:=''
+  Else
+ Begin
+  StartPos:=Length(Text)-Count+1;
+  If StartPos<1 Then StartPos:=1;
+  AnsiRightStr:=Copy(Text,StartPos,Count);
+ End;
 End;
 
 Function DupeString(Const Text:String;Count:Integer):String;
