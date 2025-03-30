@@ -24,4 +24,9 @@ Bibliothèque de compatibilité avec Delphi écrit en Turbo Pascal
     <td><b>TYPES.PAS</b></td>
     <td>Cette unité contient les types divers.</td>
     </td>
+  <tr>
+    <td><b>VARIANTS.PAS</b></td>
+    <td>Cette unité contient les routines et les données de manipulations de variantes.</td>
+  </tr>
+      
 </table>
