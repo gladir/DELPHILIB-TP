@@ -9,6 +9,10 @@ Bibliothèque de compatibilité avec Delphi écrit en Turbo Pascal
     <th>Description</th>
   </tr>
   <tr>
+    <td><b>STRUTILS.PAS</b></td>
+    <td>Cette unité contient les fonctions, procédures, variables et constantes avancé pour la manipulation des chaines de caractères.</td>
+  </tr>
+  <tr>
      <td><b>SYSUTILS.PAS</b></td>
      <td>Cette unité contient les fonctions, procédures, variables et constantes d'outils complémentaire au système.</td>
   </tr>
