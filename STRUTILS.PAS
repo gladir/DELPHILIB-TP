@@ -19,6 +19,7 @@ Function AnsiMidStr(Const Text:String;Const Start:Integer;Const Count:Integer):S
 Function AnsiReplaceStr(Const Text,FromText,ToText:String):String;
 Function AnsiReverseString(Const Text:String):String;
 Function AnsiRightStr(Const Text:String;Const Count:Integer):String;
+Function AnsiStartsStr(Const SubText:String; Const Text:String):Boolean;
 Function DupeString(Const Text:String;Count:Integer):String;
 
 IMPLEMENTATION
@@ -161,6 +162,15 @@ Begin
   If StartPos<1 Then StartPos:=1;
   AnsiRightStr:=Copy(Text,StartPos,Count);
  End;
+End;
+
+Function AnsiStartsStr(Const SubText:String; Const Text:String):Boolean;
+Var
+ LenSub:Integer;
+Begin
+ LenSub:=Length(SubText);
+ If LenSub>Length(Text)Then AnsiStartsStr:=False
+                       Else AnsiStartsStr:=Copy(Text,1,LenSub)=SubText;
 End;
 
 Function DupeString(Const Text:String;Count:Integer):String;
