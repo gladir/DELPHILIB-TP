@@ -60,7 +60,20 @@ Function  Payment(Rate:Extended;NPeriods:Integer;PresentValue,FutureValue:Extend
 Function  Poly(X:Extended;Const Coefficients:Array of Double):Extended;
 Function  Power(Base,Exponent:Extended):Extended;
 Function  RadToCycle(Radians:Extended):Extended;
+Function  RadToDeg(Radians:Extended):Extended;
+Function  RadToGrad(Radians:Extended):Extended;
+Function  RandG(Mean,StdDev:Extended):Extended;
+Function  SinH(X:Extended):Extended;
+Function  SLNDepreciation(Cost,Salvage:Extended;Life:Integer):Extended;
+Function  StdDev(Const Data:Array of Double):Extended;
+Function  Sum(Const Data:Array of Double):Extended;
+Function  SumInt(Const Data:Array of Integer):Integer;
+Function  SumOfSquares(Const Data:Array of Double):Extended;
+Procedure SumsAndSquares(Const Data:Array of Double;Var Sum,SumOfSquares:Extended);
+Function  SYDDepreciation(Cost,Salvage:Extended;Life,Period:Integer):Extended;
 Function  Tan(X:Extended):Extended;
+Function  TanH(X:Extended):Extended;
+Function  Variance(Const Data:Array of Double):Extended;
 
 IMPLEMENTATION
 
@@ -563,9 +576,140 @@ Function RadToCycle(Radians:Extended):Extended;Begin
  RadToCycle:=Radians/(2*Pi);
 End;
 
+Function RadToDeg(Radians:Extended):Extended;
+Const
+ RadToDegFactor=180/3.141592653589793; { 180 / Pi }
+Begin
+ RadToDeg:=Radians*RadToDegFactor;
+End;
+
+Function RadToGrad(Radians:Extended):Extended;
+Const
+ RadToGradFactor = 200/3.141592653589793; { 200 / Pi }
+Begin
+ RadToGrad:=Radians*RadToGradFactor;
+End;
+
+Function RandG(Mean,StdDev:Extended):Extended;
+Var
+ U1,U2,Z:Extended;
+Begin
+ Repeat
+  U1:=Random;
+ Until U1>0;
+ U2:=Random;
+ Z:=Sqrt(-2*Ln(U1))*Cos(2*Pi*U2);
+ RandG:=Mean+StdDev*Z;
+End;
+
+Procedure SinCos(Theta:Extended;Var Sin,Cos:Extended);Begin
+ Sin:=System.Sin(Theta);
+ Cos:=System.Cos(Theta);
+End;
+
+Function SinH(X:Extended):Extended;Begin
+ SinH:=(Exp(X)-Exp(-X))/2;
+End;
+
+Function SLNDepreciation(Cost,Salvage:Extended;Life:Integer):Extended;Begin
+ If Life>0 Then SLNDepreciation:=(Cost-Salvage)/Life
+           Else SLNDepreciation:=0;
+End;
+
+Function StdDev(Const Data:Array of Double):Extended;
+Var
+ Mean,Sum,Variance:Extended;
+ I,N:Integer;
+Begin
+ N:=High(Data);
+ If N=0 Then Begin
+  StdDev:=0;
+  Exit;
+ End;
+ Sum:=0;
+ For I:=0 To N-1 do Sum:=Sum+Data[I];
+ Mean:=Sum/N;
+ Sum:=0;
+ For I:=0 To N - 1 do Sum:=Sum+Sqr(Data[I]-Mean);
+ Variance:=Sum/N;
+ StdDev:=Sqrt(Variance);
+End;
+
+Function Sum(Const Data:Array of Double):Extended;
+Var
+ I:Integer;
+ Total:Extended;
+Begin
+ Total:=0;
+ For I:=0 To High(Data) Do Total:=Total+Data[I];
+ Sum:=Total;
+End;
+
+Function SumInt(Const Data:Array of Integer):Integer;
+Var
+ I,Total:Integer;
+Begin
+ Total:=0;
+ For I:=0 To High(Data) Do Total:=Total+Data[I];
+ SumInt := Total;
+End;
+
+Function SumOfSquares(Const Data:Array of Double):Extended;
+Var
+ I:Integer;
+ Total:Extended;
+Begin
+ Total:=0.0;
+ For I:=0 To High(Data) Do Total:=Total+Sqr(Data[I]);
+ SumOfSquares:=Total;
+End;
+
+Procedure SumsAndSquares(Const Data:Array of Double;Var Sum,SumOfSquares:Extended);
+Var
+ I:Integer;
+Begin
+ Sum:=0.0;
+ SumOfSquares:=0.0;
+ For I:=0 To High(Data) do Begin
+  Sum:=Sum+Data[I];
+  SumOfSquares:=SumOfSquares+Sqr(Data[I]);
+ End;
+End;
+
+Function SYDDepreciation(Cost,Salvage:Extended;Life,Period:Integer):Extended;
+Var
+ SumOfYears:Integer;
+Begin
+ SumOfYears:=(Life*(Life+1)) Div 2;
+ SYDDepreciation:=((Life-Period+1)/SumOfYears)*(Cost-Salvage);
+End;
 
 Function Tan(X:Extended):Extended;Begin
  Tan:=Sin(X)/Cos(X);
+End;
+
+Function TanH(X:Extended):Extended;Begin
+ TanH:=(Exp(X)-Exp(-X))/(Exp(X)+Exp(-X));
+End;
+
+Function Variance(Const Data:Array of Double):Extended;
+Var
+ I,N:Integer;
+ Mean,Sum,SumSquares:Extended;
+Begin
+ N:=High(Data);
+ If N=0 Then Begin
+  Variance:=0;
+  Exit;
+ End;
+ Sum:=0;
+ SumSquares:=0;
+ For I:=0 To N-1 do Begin
+  Sum:=Sum+Data[I];
+  SumSquares:=SumSquares+Sqr(Data[I]);
+ End;
+ Mean:=Sum/N;
+ Variance:=(SumSquares/N)-Sqr(Mean);
 End;
 
 END.
