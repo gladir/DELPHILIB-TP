@@ -7,9 +7,14 @@
 
 Unit SysUtils;
 
+{$N+,E+}
+
 INTERFACE
 
+Uses DateUtil;
+
 Procedure Abort;
+Procedure DecodeDate(Date:TDateTime;Var Year,Month,Day:Word);
 Function  LowerCase(S:String):String;
 Function  RenameFile(Const OldName,NewName:String):Boolean;
 Function  SetCurrentDir(Const Dir:String):Boolean;
@@ -27,6 +32,29 @@ Procedure Beep;Begin
  Delay(200);
  NoSound;
 End;
+
+Procedure DecodeDate(Date:TDateTime;Var Year,Month,Day:Word);
+Const
+ Epoch=693594;
+Var
+ JD,L,N,I,J,K:LongInt;
+Begin
+ JD:=Trunc(Date)+Epoch+1;
+ L:=JD + 68569;
+ N:=(4 * L) div 146097;
+ L:=L - (146097 * N + 3) div 4;
+ I:=(4000 * (L + 1)) div 1461001;
+ L:=L - (1461 * I) div 4 + 31;
+ J:=(80 * L) div 2447;
+ K:=L - (2447 * J) div 80;
+ L:=J div 11;
+ J:=J + 2 - (12 * L);
+ I:=100 * (N - 49) + I + L;
+ Year:=I;
+ Month:=J;
+ Day:=K;
+End;
+
 
 Function LowerCase(S:String):String;
 Var
