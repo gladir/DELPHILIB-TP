@@ -9,6 +9,10 @@ Bibliothèque de compatibilité avec Delphi écrit en Turbo Pascal
     <th>Description</th>
   </tr>
   <tr>
+    <td><b>DATEUTIL.PAS</b></td>
+    <td>Cette unité contient les routines permettant d'effectuer des manipulations de la date et de l'heure.</td>
+  </tr>
+  <tr>
     <td><b>FILECTRL.PAS</b></td>
     <td>Cette unité contient les bases de la programmation pour effectuer des contrôles divers sur des fichiers.</td>
   </tr>
