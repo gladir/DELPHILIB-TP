@@ -40,6 +40,13 @@ Function  InterestRate(NPeriods:Integer;Payment,PresentValue,FutureValue:Extende
 Function  InternalRateOfReturn(Guess:Extended;Const CashFlows:Array of Double):Extended;
 Function  IntPower(Base:Extended;Exponent:Integer):Extended;
 Function  Ldexp(X:Extended;P:Integer):Extended;
+Function  LnXP1(X:Extended):Extended;
+Function  Log10(X:Extended):Extended;
+Function  Log2(X:Extended):Extended;
+Function  LogN(Base,X:Extended):Extended;
+Function  MaxIntValue(Const Data:Array of Integer):Integer;
+Function  MaxValue(Const Data:Array of Double):Double;
+Function  Mean(Const Data:Array of Double):Extended;
 Function  Power(Base,Exponent:Extended):Extended;
 Function  Tan(X:Extended):Extended;
 
@@ -287,6 +294,111 @@ Begin
  Ldexp:=X;
 End;
 
+Function LnXP1(X:Extended):Extended;
+Const
+ Epsilon=1E-12;
+Var
+ Term,Sum:Extended;
+ N:Integer;
+Begin
+ If X=0.0 Then Begin
+  LnXP1:=0.0;
+  Exit;
+ End;
+ If X<=-1.0 Then Begin
+  LnXP1:=-MaxInt;
+  Exit;
+ End;
+ If Abs(X)<0.5 Then Begin
+  Sum:=0.0;
+  Term:=X;
+  N:=1;
+  While Abs(Term)>Epsilon do Begin
+   Sum:=Sum+Term/N;
+   Term:=-Term*X;
+   Inc(N);
+  End;
+  LnXP1:=Sum;
+ End
+  Else
+ LnXP1:=Ln(1.0+X);
+End;
+
+Function Log10(X:Extended):Extended;
+Const
+ Ln10=2.302585092994045684; { ln(10) }
+Begin
+ If X<=0.0 Then Begin
+  Log10:=-MaxInt;
+  Exit;
+ End;
+ Log10:=Ln(X)/Ln10;
+End;
+
+Function Log2(X:Extended):Extended;
+Const
+ Ln2=0.6931471805599453; { ln(2) }
+Begin
+ If X<=0.0 Then Begin
+  Log2:=-MaxInt;
+  Exit;
+ End;
+ Log2:=Ln(X)/Ln2;
+End;
+
+Function LogN(Base,X:Extended):Extended;Begin
+ If(X<=0.0)or(Base<=0.0)or(Base=1.0)Then Begin
+  LogN:=-MaxInt;
+  Exit;
+ End;
+ LogN:=Ln(X)/Ln(Base);
+End;
+
+Function MaxIntValue(Const Data:Array of Integer):Integer;
+Var
+ I,MaxValue:Integer;
+Begin
+ If High(Data)=0 Then Begin
+  MaxIntValue:=-MaxInt;
+  Exit;
+ End;
+ MaxValue:=Data[Low(Data)];
+ For I:=Low(Data)+1 To High(Data) do Begin
+  If Data[I]>MaxValue Then MaxValue:=Data[I];
+ End;
+ MaxIntValue:=MaxValue;
+End;
+
+Function MaxValue(Const Data:Array of Double):Double;
+Var
+ I:Integer;
+ MaxVal:Double;
+Begin
+ If High(Data)=0 Then Begin
+  MaxValue:=-1.7E+308;
+  Exit;
+ End;
+ MaxVal:=Data[Low(Data)];
+ For I:=Low(Data)+1 To High(Data) do Begin
+  If Data[I]>MaxVal Then MaxVal:=Data[I];
+ End;
+ MaxValue:=MaxVal;
+End;
+
+Function Mean(Const Data:Array of Double):Extended;
+Var
+ I,N:Integer;
+ Sum:Extended;
+Begin
+ N:=High(Data);
+ If N=0 Then Begin
+  Mean:=0.0;
+  Exit;
+ End;
+ Sum:=0.0;
+ For I:=Low(Data) To High(Data) do Sum:=Sum+Data[I];
+ Mean:=Sum/N;
+End;
 
 
 Function Power(Base,Exponent:Extended):Extended;
