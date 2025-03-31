@@ -13,7 +13,7 @@ INTERFACE
 
 Type
  TValueRelationship=(LessThan,Equals,GreaterThan);
- TPaymentTime=(tpEndOfPeriod, tpBeginOfPeriod);
+ TPaymentTime=(ptEndOfPeriod, ptBeginningOfPeriod);
 
 Function  ArcCos(a:Extended):Extended;
 Function  ArcCosH(x:Extended):Extended;
@@ -47,7 +47,19 @@ Function  LogN(Base,X:Extended):Extended;
 Function  MaxIntValue(Const Data:Array of Integer):Integer;
 Function  MaxValue(Const Data:Array of Double):Double;
 Function  Mean(Const Data:Array of Double):Extended;
+Procedure MeanAndStdDev(Const Data:Array of Double;Var Mean,StdDev:Extended);
+Function  MinIntValue(Const Data:Array of Integer):Integer;
+Function  MinValue(Const Data:Array of Double):Double;
+Function  NetPresentValue(Rate:Extended;Const CashFlows:Array of Double;
+                          PaymentTime:TPaymentTime):Extended;
+Function  Norm(Const Data:Array of Double):Extended;
+Function  NumberOfPeriods(Rate,Payment,PresentValue,FutureValue:Extended;
+                          PaymentTime:TPaymentTime):Extended;
+Function  Payment(Rate:Extended;NPeriods:Integer;PresentValue,FutureValue:Extended;
+                  PaymentTime:TPaymentTime):Extended;
+Function  Poly(X:Extended;Const Coefficients:Array of Double):Extended;
 Function  Power(Base,Exponent:Extended):Extended;
+Function  RadToCycle(Radians:Extended):Extended;
 Function  Tan(X:Extended):Extended;
 
 IMPLEMENTATION
@@ -181,11 +193,11 @@ Begin
  End
   Else
  Begin
-  If PaymentTime=tpEndOfPeriod Then Begin
+  If PaymentTime=ptEndOfPeriod Then Begin
    FV:=PresentValue*Power(1+Rate,NPeriods)+Payment*((Power(1+Rate,NPeriods)-1)/Rate);
   End
    Else
-  If(PaymentTime=tpBeginOfPeriod)Then Begin
+  If(PaymentTime=ptBeginningOfPeriod)Then Begin
    FV:=PresentValue*Power(1+Rate,NPeriods)+Payment*((Power(1+Rate,NPeriods)-1)/Rate)*(1+Rate);
   End;
  End;
@@ -209,11 +221,11 @@ Begin
  If Rate=0 Then Payment:=(PresentValue-FutureValue)/NPeriods
   Else
  Begin
-  If PaymentTime=tpEndOfPeriod Then Begin
+  If PaymentTime=ptEndOfPeriod Then Begin
    Payment:=(PresentValue*Rate*Power(1+Rate,NPeriods)-FutureValue*Rate)/(Power(1+Rate,NPeriods)-1);
   End
    Else
-  If PaymentTime=tpBeginOfPeriod Then Begin
+  If PaymentTime=ptBeginningOfPeriod Then Begin
    Payment:=(PresentValue*Rate*Power(1+Rate,NPeriods)-FutureValue*Rate)/(Power(1+Rate,NPeriods)-1)*(1+Rate);
   End;
  End;
@@ -232,11 +244,11 @@ Begin
  Tolerance:=0.0001;
  Iterations:=0;
  Repeat
-  If PaymentTime=tpEndOfPeriod Then Begin
+  If PaymentTime=ptEndOfPeriod Then Begin
    PaymentCalc:=(PresentValue*Rate*Power(1+Rate,NPeriods)-FutureValue*Rate)/(Power(1+Rate,NPeriods)-1);
   End
    Else
-  If PaymentTime=tpBeginOfPeriod Then Begin
+  If PaymentTime=ptBeginningOfPeriod Then Begin
    PaymentCalc:=(PresentValue*Rate*Power(1+Rate,NPeriods)-FutureValue*Rate)/(Power(1+Rate,NPeriods)-1)*(1+Rate);
   End;
   If(Abs(Payment-PaymentCalc)<Tolerance)Then Break;
@@ -400,6 +412,137 @@ Begin
  Mean:=Sum/N;
 End;
 
+Procedure MeanAndStdDev(Const Data:Array of Double;Var Mean,StdDev:Extended);
+Var
+ Sum,SumSquares:Extended;
+ I,N:Integer;
+Begin
+ N:=High(Data);
+ If N=0 Then Begin
+  Mean:=0;
+  StdDev:=0;
+  Exit;
+ End;
+ Sum:=0;
+ SumSquares:=0;
+ For I:=0 To N-1 do Begin
+  Sum:=Sum+Data[I];
+  SumSquares:=SumSquares+Sqr(Data[I]);
+ End;
+ Mean:=Sum/N;
+ StdDev:=Sqrt((SumSquares/N)-Sqr(Mean));
+End;
+
+Function MinIntValue(Const Data:Array of Integer):Integer;
+Var
+ I,MinVal,N:Integer;
+Begin
+ N:=High(Data);
+ If N=0 Then Begin
+  MinIntValue:=0;
+  Exit;
+ End;
+ MinVal:=Data[0];
+ For I:=1 To N-1 Do If Data[I]<MinVal Then MinVal:=Data[I];
+ MinIntValue:=MinVal;
+End;
+
+Function MinValue(Const Data:Array of Double):Double;
+Var
+ I,N:Integer;
+ MinVal:Double;
+Begin
+ N:=High(Data);
+ If N=0 Then Begin
+  MinValue := 0.0;
+  Exit;
+ End;
+ MinVal:=Data[0];
+ For I:=1 To N-1 Do If Data[I]<MinVal Then MinVal := Data[I];
+ MinValue:=MinVal;
+End;
+
+Function NetPresentValue(Rate:Extended;Const CashFlows:Array of Double;
+                        PaymentTime:TPaymentTime):Extended;
+Var
+ I,N:Integer;
+ NPV:Extended;
+Begin
+ N:=High(CashFlows);
+ NPV:=0.0;
+ If N=0 Then Begin
+  NetPresentValue := 0.0;
+  Exit;
+ End;
+ For I:=0 To N-1 do Begin
+  If PaymentTime=ptBeginningOfPeriod Then NPV:=NPV+(CashFlows[I]/Power(1+Rate,I))
+                             Else NPV:=NPV+(CashFlows[I]/Power(1+Rate,I+1));
+ End;
+ NetPresentValue:=NPV;
+End;
+
+Function Norm(Const Data:Array of Double):Extended;
+Var
+ I:Integer;
+ SumSquares:Extended;
+Begin
+ SumSquares:=0.0;
+ For I:=Low(Data) To High(Data) Do SumSquares:=SumSquares+Sqr(Data[I]);
+ Norm:=Sqrt(SumSquares);
+End;
+
+Function NumberOfPeriods(Rate,Payment,PresentValue,FutureValue:Extended;
+                         PaymentTime:TPaymentTime):Extended;
+Var
+ AdjustFactor,Num,Denom:Extended;
+Begin
+ If PaymentTime=ptBeginningOfPeriod Then AdjustFactor:=1+Rate
+                                    Else AdjustFactor:=1;
+ If Rate=0 Then Begin
+  If Payment=0 Then NumberOfPeriods:=0
+               Else NumberOfPeriods:=(FutureValue-PresentValue)/Payment;
+  Exit;
+ End;
+ Num:=Payment*AdjustFactor+Rate*FutureValue;
+ Denom:=Payment*AdjustFactor+Rate*PresentValue;
+ If(Denom=0)or(Num/Denom<=0)Then NumberOfPeriods:=0
+                            Else NumberOfPeriods:=Log10(Num/Denom)/Log10(1+Rate);
+End;
+
+Function Payment(Rate:Extended;NPeriods:Integer;PresentValue,FutureValue:Extended;
+                 PaymentTime:TPaymentTime):Extended;
+Var
+ AdjustFactor:Extended;
+Begin
+ If PaymentTime=ptBeginningOfPeriod Then AdjustFactor:=1+Rate
+                                    Else AdjustFactor:=1;
+ If Rate=0 Then Payment:=(PresentValue+FutureValue)/NPeriods
+           Else Payment:=(Rate*(PresentValue*AdjustFactor+FutureValue))/(1-Power(1+Rate,-NPeriods));
+End;
+
+Function PeriodPayment(Rate:Extended;Period,NPeriods:Integer;
+                      PresentValue,FutureValue:Extended;
+                      PaymentTime:TPaymentTime):Extended;
+Var
+ AdjustFactor:Extended;
+Begin
+ If PaymentTime=ptBeginningOfPeriod Then AdjustFactor:=1+Rate
+                                    Else AdjustFactor:=1;
+ If Rate=0 Then PeriodPayment:=(PresentValue+FutureValue)/NPeriods
+           Else PeriodPayment:=(Rate*(PresentValue*AdjustFactor+FutureValue))/(1-Power(1+Rate,-NPeriods));
+End;
+
+Function Poly(X:Extended;Const Coefficients:Array of Double):Extended;
+Var
+ I:Integer;
+ R:Extended;
+Begin
+ R:=0;
+ For I:=Low(Coefficients) to High(Coefficients) do Begin
+  R:=R*X+Coefficients[I];
+ End;
+ Poly:=R;
+End;
 
 Function Power(Base,Exponent:Extended):Extended;
 Var
@@ -407,13 +550,17 @@ Var
  R:Extended;
 Begin
  If Exponent=0 Then Power:=1 Else
- If Exponent > 0 Then Begin
+ If Exponent>0 Then Begin
   R:=1;
   For I:=1 to Trunc(Exponent) Do R:=R*Base;
   Power:=R;
  End
   Else
  Power:=1/Power(Base,-Exponent);
+End;
+
+Function RadToCycle(Radians:Extended):Extended;Begin
+ RadToCycle:=Radians/(2*Pi);
 End;
 
 
