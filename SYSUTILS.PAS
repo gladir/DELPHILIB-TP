@@ -11,10 +11,11 @@ Unit SysUtils;
 
 INTERFACE
 
-Uses DateUtil;
+Uses {$IFDEF FPC}DateUtil{$ELSE}DateUtils{$ENDIF};
 
 Procedure Abort;
 Procedure DecodeDate(Date:TDateTime;Var Year,Month,Day:Word);
+
 Function  LowerCase(S:String):String;
 Function  RenameFile(Const OldName,NewName:String):Boolean;
 Function  SetCurrentDir(Const Dir:String):Boolean;
@@ -55,6 +56,17 @@ Begin
  Day:=K;
 End;
 
+Function FileExists(Const FileName:String):Boolean;
+Var
+ f:File;
+ R:Boolean;
+Begin
+ Assign(f,FileName);
+ {$I-}Reset(f);{$I+}
+ R:=IOResult=0;
+ If(R)Then Close(f);
+ FileExists:=R;
+End;
 
 Function LowerCase(S:String):String;
 Var

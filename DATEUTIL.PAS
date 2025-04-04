@@ -5,7 +5,7 @@
   @type: Library
 }
 
-Unit DATEUTIL;
+Unit {$IFDEF FPC}DATEUTIL{$ELSE}DateUtils{$ENDIF};
 
 {$N+,E+}
 
