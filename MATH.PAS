@@ -63,6 +63,7 @@ Function  RadToCycle(Radians:Extended):Extended;
 Function  RadToDeg(Radians:Extended):Extended;
 Function  RadToGrad(Radians:Extended):Extended;
 Function  RandG(Mean,StdDev:Extended):Extended;
+Procedure SinCos(Theta:Extended;Var Sin,Cos:Extended);
 Function  SinH(X:Extended):Extended;
 Function  SLNDepreciation(Cost,Salvage:Extended;Life:Integer):Extended;
 Function  StdDev(Const Data:Array of Double):Extended;
